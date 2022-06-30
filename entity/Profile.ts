@@ -13,8 +13,26 @@ export class Profile implements ProfileInterface {
    /**
     * toJson
     */
-   public toJson() {
-    return JSON.stringify(this)
+   public toJSON() {
+    return {
+        _id: this._id,
+        name: this.name,
+        age: this.age,
+        address: this.address,
+        created_date: this.created_date,
+        updated_date: this.updated_date,
+    }
    }
+
+//    public fromJSON(json: {
+//     _id: string,
+//     name: string,
+//     age: number,
+//     address: string[],
+//     created_date: Date,
+//     updated_date: Date,
+//    }) {
+//     return new Profile(json._id, json.name, json.age, json.address, json.created_date, json.updated_date)
+//    }
 
 }
