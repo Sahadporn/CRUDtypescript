@@ -3,7 +3,7 @@ import express from "express"
 import bodyParser from "body-parser"
 ;-bodyParser
 import { MongoRepo } from "./repositories/mongorepo";
-import {getAllProfileUseCase, getDataByIdUseCase} from "./useCases/get_profile"
+import {getAllProfileUseCase, getDataByIdUseCase} from "./useCases/profile-usecases"
 
 const app = express()
 const port = 3000

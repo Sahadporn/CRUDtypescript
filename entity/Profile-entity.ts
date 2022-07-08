@@ -1,6 +1,6 @@
 import {ProfileInterface} from "./Interface";
 
-export class Profile implements ProfileInterface {
+export class ProfileEntity implements ProfileInterface {
     constructor(public _id: string, public name: string, public age: number, public address: string[], public created_date: Date, public updated_date: Date) {
         this._id = _id
         this.name = name

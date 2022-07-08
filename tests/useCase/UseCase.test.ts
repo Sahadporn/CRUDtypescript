@@ -1,4 +1,4 @@
-import { getAllProfileUseCase, getDataByIdUseCase } from "../../useCases/get_profile";
+import { getAllProfileUseCase, getDataByIdUseCase } from "../../useCases/profile-usecases";
 import {jest} from '@jest/globals';
 import { MemRepo } from "../../repositories/memrepo";
 
