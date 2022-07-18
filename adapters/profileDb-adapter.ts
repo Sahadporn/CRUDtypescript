@@ -1,6 +1,9 @@
 import { Collection, MongoClient } from "mongodb"
 import { ProfileEntity } from "../entity/Profile-entity"
 import { ProfileDbInterface } from "../useCases/profile-usecases"
+import "reflect-metadata"
+import { Container, Service } from "typedi"
+import { config } from "../presenters/config"
 
 type DbConfig = {
   user: string
@@ -11,6 +14,7 @@ type DbConfig = {
   collection: string
 }
 
+@Service()
 export class ProfileDbAdapter implements ProfileDbInterface {
   private dbCollection: Collection<ProfileEntity> | any
   private readonly dbConfig: DbConfig
@@ -26,6 +30,10 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     this.dbCollection = connection
       .db(this.dbConfig.db)
       .collection(this.dbConfig.collection)
+  }
+
+  public getConfig() {
+    return this.dbConfig
   }
 
   public createProfileObject(result: any) {
@@ -96,3 +104,8 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     }
   }
 }
+
+// Container.set([{
+//   id: "ProfileDbDi",
+//   value: new ProfileDbAdapter(config.mongoConfig)
+// }])

@@ -1,3 +1,5 @@
+import 'reflect-metadata'
+
 import express from "express"
 import cors from "cors"
 import { config } from "./config"
@@ -6,6 +8,9 @@ import bodyParser from "body-parser"
 import { profileRoute } from "./routes/profile-routes"
 import swaggerUi from "swagger-ui-express"
 import * as swaggerDocument from "../swagger.json"
+import { InitContainer } from "./di";
+
+InitContainer()
 
 const app = express()
 const allowedOrigins = ["http://localhost:3000"]

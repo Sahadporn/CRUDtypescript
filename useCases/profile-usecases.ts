@@ -1,5 +1,7 @@
 import { ProfileEntity } from "../entity/Profile-entity"
-
+import "reflect-metadata"
+import {Container, Inject, Service} from "typedi"
+import { ProfileDbAdapter } from "../adapters/profileDb-adapter"
 export interface ProfileDbInterface {
   getAll(): Promise<ProfileEntity[]>
   getById(id: string): Promise<ProfileEntity>
@@ -12,15 +14,29 @@ export interface ProfileDbInterface {
   delete(id: string): Promise<void>
 }
 
+// @Service("profileUseCase")
+@Service()
 export class ProfileUseCase {
-  private readonly profileDb: ProfileDbInterface
+  // private readonly profileDb: ProfileDbInterface
 
-  constructor(profileDb: ProfileDbInterface) {
-    this.profileDb = profileDb
-  }
+  // constructor(profileDb: ProfileDbInterface) {
+  //   this.profileDb = profileDb
+  // }
+  
+  constructor(
+    @Inject("ProfileDbDi")
+    public profileDb: ProfileDbAdapter
+    ) {this.profileDb.connect()}
 
-  public async getAllProfileUseCase(): Promise<ProfileEntity[]> {
+  public async getAllProfileUseCase() /*: Promise<ProfileEntity[]>*/ {
     return await this.profileDb.getAll()
+    // try {
+    //   console.log(this.profileDb, "\nXXXXXXXXXXX")
+    //   console.log(typeof this.profileDb)
+    //   return await this.profileDb.getAll()
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
 
   public async getDataByIdUseCase(id: string): Promise<ProfileEntity> {
