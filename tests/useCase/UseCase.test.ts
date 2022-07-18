@@ -1,6 +1,6 @@
-import { getAllProfileUseCase, getDataByIdUseCase } from "../../useCases/profile-usecases";
+import { ProfileUseCase } from '../../useCases/profile-usecases';
 import {jest} from '@jest/globals';
-import { MemRepo } from "../../repositories/memrepo";
+import { ProfileDbAdapter } from '../../adapters/profileDb-adapter';
 
 const jsonProfiles = [{
     _id: "924927",
@@ -38,22 +38,54 @@ const jsonProfiles = [{
 // //     }
 // // })
 
-let repo = new MemRepo(jsonProfiles)
+// const mockDb = jest.fn()
+// jest.mock("../../adapters/profileDb-adapter", () => {
+//     return jest.fn().mockImplementation(() => {
+//         return {mockdb: mockDb};
+// })
+// })
+
+const mockedDb = require("../../adapters/profileDb-adapter")()
+jest.mock("../../adapters/profileDb-adapter")
 
 describe("Test for use cases", () => {
-    // beforeEach(() => {
-    //     // Reset "amount of times called" back to 0 for each test
-    //     jest.clearAllMocks()
-    // })
+    const profileUseCase = new ProfileUseCase(mockedDb)
     
-    test("get all data", () => {
-        let result = getAllProfileUseCase(repo)
-
+    beforeEach(() => {
+        // Reset "amount of times called" back to 0 for each test
+        jest.clearAllMocks()
+        mockedDb.getAll().mockImplementation(() => {
+            return jsonProfiles
+        })
+        mockedDb.getById().mockImplementation(() => {
+            return jsonProfiles[0]
+        })
+    })
+    
+    test("get all profiles", () => {
+        let result = profileUseCase.getAllProfileUseCase()
+        
         expect(result).toEqual(jsonProfiles)
     })
-    test("get data by id", () => {
-        let result = getDataByIdUseCase(repo, "924927")
+    test("get profile by id", () => {
+        let result = profileUseCase.getDataByIdUseCase("924927")
 
         expect(result).toEqual(jsonProfiles[0])
+    })
+    test("post profile", () => {
+        let result = profileUseCase.postDataUseCase("211", "Mock dude", 99, ["mock land", "Mocking city"])
+
+        expect(mockedDb.insert()).toBeCalled()
+        
+    })
+    test("put profile", () => {
+        let result = profileUseCase.putDataUseCase("211", "Mock dude", 99, ["mock land", "Mocking city"])
+
+        expect(mockedDb.insert()).toBeCalled()
+    })
+    test("delete profile", () => {
+        let result = profileUseCase.deleteDataUseCase("211")
+
+        expect(mockedDb.delete()).toBeCalled()
     })
 })

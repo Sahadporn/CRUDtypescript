@@ -1,6 +1,6 @@
 export const config = {
     port: 3000,
-    mongoConfi: {
+    mongoConfig: {
         user: "root",
         password: "root",
         host: "localhost",

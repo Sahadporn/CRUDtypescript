@@ -1,6 +1,6 @@
-import { Profile } from "../../entity/Profile"
+import { ProfileEntity } from "../../entity/Profile-entity"
 
-const profile1 = new Profile("924927", "Mary", 12, ["society", "usa"], new Date(2018, 11, 24, 10, 33, 30, 0), new Date(2018, 11, 24, 10, 33, 30, 0))
+const profile1 = new ProfileEntity("924927", "Mary", 12, ["society", "usa"], new Date(2018, 11, 24, 10, 33, 30, 0), new Date(2018, 11, 24, 10, 33, 30, 0))
 const jsonProfile = {
   _id: "924927",
   name: "Mary",
@@ -23,7 +23,7 @@ describe("Testing Profile", () => {
     expect(profile1.toJSON()).toMatchObject(jsonProfile)
   })
   test("test compare the instance of profile", () => {
-    let profile2 = new Profile("924927", "Mary", 12, ["society", "usa"], new Date(2018, 11, 24, 10, 33, 30, 0), new Date(2018, 11, 24, 10, 33, 30, 0))
+    let profile2 = new ProfileEntity("924927", "Mary", 12, ["society", "usa"], new Date(2018, 11, 24, 10, 33, 30, 0), new Date(2018, 11, 24, 10, 33, 30, 0))
     
     expect(profile2).toMatchObject(profile1)
   })
