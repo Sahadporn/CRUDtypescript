@@ -1,5 +1,4 @@
 import { ProfileEntity } from "../entity/Profile-entity"
-import "reflect-metadata"
 import {Container, Inject, Service} from "typedi"
 import { ProfileDbAdapter } from "../adapters/profileDb-adapter"
 export interface ProfileDbInterface {
@@ -25,8 +24,8 @@ export class ProfileUseCase {
   
   constructor(
     @Inject("ProfileDbDi")
-    public profileDb: ProfileDbAdapter
-    ) {this.profileDb.connect()}
+    private readonly profileDb: ProfileDbAdapter
+    ) {}
 
   public async getAllProfileUseCase() /*: Promise<ProfileEntity[]>*/ {
     return await this.profileDb.getAll()

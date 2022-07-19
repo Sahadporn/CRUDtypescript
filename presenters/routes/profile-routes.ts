@@ -3,7 +3,6 @@ import { ProfileDbAdapter } from "../../adapters/profileDb-adapter"
 import { ProfileUseCase } from "../../useCases/profile-usecases"
 import { config } from "../config"
 
-import "reflect-metadata"
 import { Container, Inject, Service } from "typedi"
 
 const profileUseCase: ProfileUseCase = Container.get("profileUseCase")
@@ -19,6 +18,7 @@ export const getAllProfileController = async (
     // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
     // await profileDbAdapter.connect()
     // const profileUseCase = new ProfileUseCase(profileDbAdapter)
+    const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
     const profiles = await profileUseCase.getAllProfileUseCase()
 
 
@@ -37,6 +37,7 @@ export const getProfileController = async (
     // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
     // await profileDbAdapter.connect()
     // const profileUseCase = new ProfileUseCase(profileDbAdapter)
+    const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
     const profile = await profileUseCase.getDataByIdUseCase(id)
     res.status(200).send(profile.toJSON())
   } catch (err) {
@@ -56,6 +57,7 @@ export const postProfileController = async (
       // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
       // await profileDbAdapter.connect()
       // const profileUseCase = new ProfileUseCase(profileDbAdapter)
+      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
       await profileUseCase.postDataUseCase(_id, name, age, address)
 
       res.status(201).send({ status: "SUCCESS" })
@@ -77,6 +79,7 @@ export const putProfileController = async (req: express.Request, res: express.Re
       // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
       // await profileDbAdapter.connect()
       // const profileUseCase = new ProfileUseCase(profileDbAdapter)
+      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
       await profileUseCase.putDataUseCase(id, name, age, address)
 
       res.status(201).send({ status: "SUCCESS" })
@@ -98,6 +101,7 @@ export const deleteProfileController = async (req: express.Request, res: express
       await profileDbAdapter.connect()
       const profileUseCaseq = new ProfileUseCase(profileDbAdapter)
       console.log("inside try 2")
+      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
       await profileUseCase.deleteDataUseCase(id)
 
       res.status(201).send({ status: `DELETE ${id} SUCCESS` })

@@ -7,10 +7,6 @@ const InitContainer = async () => {
     await dbConnection.connect()
 
     Container.set("ProfileDbDi", dbConnection)
-    // Container.set([{
-    //     id: "ProfileDbDi",
-    //     value: new ProfileDbAdapter(config.mongoConfig).connect()
-    // }])
 }
 
 export { InitContainer }

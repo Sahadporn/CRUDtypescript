@@ -1,8 +1,8 @@
+import { Container, Service } from "typedi"
+
 import { Collection, MongoClient } from "mongodb"
 import { ProfileEntity } from "../entity/Profile-entity"
 import { ProfileDbInterface } from "../useCases/profile-usecases"
-import "reflect-metadata"
-import { Container, Service } from "typedi"
 import { config } from "../presenters/config"
 
 type DbConfig = {
@@ -104,8 +104,3 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     }
   }
 }
-
-// Container.set([{
-//   id: "ProfileDbDi",
-//   value: new ProfileDbAdapter(config.mongoConfig)
-// }])
