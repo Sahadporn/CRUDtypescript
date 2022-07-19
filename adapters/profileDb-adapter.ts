@@ -1,9 +1,8 @@
-import { Collection, MongoClient } from "mongodb"
-import { ProfileEntity } from "../entity/Profile-entity"
-import { ProfileDbInterface } from "../useCases/profile-usecases"
-import "reflect-metadata"
-import { Container, Service } from "typedi"
-import { config } from "../presenters/config"
+import { Service } from 'typedi'
+
+import { Collection, MongoClient } from 'mongodb'
+import { ProfileEntity } from '../entity/Profile-entity'
+import { ProfileDbInterface } from '../useCases/profile-usecases'
 
 type DbConfig = {
   user: string
@@ -85,14 +84,14 @@ export class ProfileDbAdapter implements ProfileDbInterface {
           $set: {
             name: name,
             age: age,
-            address: address,
+            address: address
           },
-          $setOnInsert: { created_date: new Date() },
+          $setOnInsert: { created_date: new Date() }
         },
         { upsert: true }
       )
     } catch (err) {
-      console.log("Insert failed: ", err)
+      console.log('Insert failed: ', err)
     }
   }
 
@@ -100,12 +99,7 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     try {
       let res = await this.dbCollection.deleteOne({ _id: id })
     } catch (err) {
-      console.log("Deletion failed: ", err)
+      console.log('Deletion failed: ', err)
     }
   }
 }
-
-// Container.set([{
-//   id: "ProfileDbDi",
-//   value: new ProfileDbAdapter(config.mongoConfig)
-// }])
