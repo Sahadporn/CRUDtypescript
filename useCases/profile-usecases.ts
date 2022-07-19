@@ -1,7 +1,7 @@
-import { ProfileEntity } from "../entity/Profile-entity"
-import "reflect-metadata"
-import {Container, Inject, Service} from "typedi"
-import { ProfileDbAdapter } from "../adapters/profileDb-adapter"
+import { Inject, Service } from 'typedi'
+
+import { ProfileEntity } from '../entity/Profile-entity'
+import { ProfileDbAdapter } from '../adapters/profileDb-adapter'
 export interface ProfileDbInterface {
   getAll(): Promise<ProfileEntity[]>
   getById(id: string): Promise<ProfileEntity>
@@ -14,7 +14,6 @@ export interface ProfileDbInterface {
   delete(id: string): Promise<void>
 }
 
-// @Service("profileUseCase")
 @Service()
 export class ProfileUseCase {
   // private readonly profileDb: ProfileDbInterface
@@ -22,11 +21,11 @@ export class ProfileUseCase {
   // constructor(profileDb: ProfileDbInterface) {
   //   this.profileDb = profileDb
   // }
-  
+
   constructor(
-    @Inject("ProfileDbDi")
-    public profileDb: ProfileDbAdapter
-    ) {this.profileDb.connect()}
+    @Inject('ProfileDbDi')
+    private readonly profileDb: ProfileDbAdapter
+  ) {}
 
   public async getAllProfileUseCase() /*: Promise<ProfileEntity[]>*/ {
     return await this.profileDb.getAll()
