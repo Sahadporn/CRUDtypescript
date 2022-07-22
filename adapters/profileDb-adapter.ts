@@ -1,9 +1,10 @@
-import { Collection, MongoClient } from "mongodb"
-import { ProfileEntity } from "../entity/Profile-entity"
-import { ProfileDbInterface } from "../useCases/profile-usecases"
-import "reflect-metadata"
-import { Container, Service } from "typedi"
-import { config } from "../presenters/config"
+import { Collection, MongoClient } from 'mongodb'
+import { ProfileEntity } from '../entity/Profile-entity'
+import { ProfileDbInterface } from '../useCases/profile-usecases'
+import 'reflect-metadata' // TODO: Remove this
+import { Container, Service } from 'typedi'
+import { config } from '../presenters/config'
+import { ElementFlags } from 'typescript'
 
 type DbConfig = {
   user: string
@@ -16,7 +17,7 @@ type DbConfig = {
 
 @Service()
 export class ProfileDbAdapter implements ProfileDbInterface {
-  private dbCollection: Collection<ProfileEntity> | any
+  private dbCollection: Collection<ProfileEntity> | any // TODO: Don't have to be any
   private readonly dbConfig: DbConfig
 
   constructor(dbConfig: DbConfig) {
@@ -36,7 +37,11 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     return this.dbConfig
   }
 
-  public createProfileObject(result: any) {
+  // TODO: Is public, can be used by other in wrong ways
+  // result: any
+  // private => cannot test
+  // too much chore, just implement it directly
+  private createProfileObject(result: any) {
     return new ProfileEntity(
       result._id,
       result.name,
@@ -54,8 +59,10 @@ export class ProfileDbAdapter implements ProfileDbInterface {
       throw new Error(`Cannot retrieve data`)
     }
 
+    // TODO: Use map instead of forEach
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
     let arr: ProfileEntity[] = []
-    data.forEach((element: ProfileEntity) => {
+    data.map((element: ProfileEntity) => {
       arr.push(this.createProfileObject(element))
     })
     return arr
@@ -71,6 +78,10 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     return this.createProfileObject(data)
   }
 
+  // TODO: Do you want to always update name, age and address?
+  // TODO: Make sure that name, age and address is not undefined at runtime
+  // TODO: The function name is not clear, who would have known it can update too!!
+  // Refactor this into two function better na!
   public async insert(
     id: string,
     name: string,
@@ -85,14 +96,14 @@ export class ProfileDbAdapter implements ProfileDbInterface {
           $set: {
             name: name,
             age: age,
-            address: address,
+            address: address
           },
-          $setOnInsert: { created_date: new Date() },
+          $setOnInsert: { created_date: new Date() }
         },
         { upsert: true }
       )
     } catch (err) {
-      console.log("Insert failed: ", err)
+      console.log('Insert failed: ', err)
     }
   }
 
@@ -100,11 +111,12 @@ export class ProfileDbAdapter implements ProfileDbInterface {
     try {
       let res = await this.dbCollection.deleteOne({ _id: id })
     } catch (err) {
-      console.log("Deletion failed: ", err)
+      console.log('Deletion failed: ', err)
     }
   }
 }
 
+// TODO: Delete this
 // Container.set([{
 //   id: "ProfileDbDi",
 //   value: new ProfileDbAdapter(config.mongoConfig)
