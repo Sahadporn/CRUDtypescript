@@ -1,10 +1,11 @@
 import "reflect-metadata"
 
-import express from "express"
+import express, { NextFunction } from "express"
 import cors from "cors"
 import { config } from "./config"
 import bodyParser from "body-parser"
-;-bodyParser
+import methodOverride from "method-override"
+
 import { profileRoute } from "./routes/profile-routes"
 import swaggerUi from "swagger-ui-express"
 import * as swaggerDocument from "../swagger.json"
@@ -18,6 +19,12 @@ const initApp = async () => {
   const options: cors.CorsOptions = {
     origin: allowedOrigins,
   }
+
+  function errorHandler (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
+    res.status(500)
+    res.render('error ', { error: err })
+  }
+  
   app.use(cors(options))
   app.use(bodyParser.json())
   app.use(bodyParser.urlencoded({ extended: false }))
@@ -32,6 +39,9 @@ const initApp = async () => {
   })
 
   app.use("/student", profileRoute)
+
+  app.use(methodOverride())
+  app.use(errorHandler)
 
   app.listen(config.port, () =>
     console.log(`App listening on PORT ${config.port}`)

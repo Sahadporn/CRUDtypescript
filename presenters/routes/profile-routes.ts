@@ -1,120 +1,91 @@
-import express from "express"
-import { ProfileDbAdapter } from "../../adapters/profileDb-adapter"
-import { ProfileUseCase } from "../../useCases/profile-usecases"
-import { config } from "../config"
+import express from 'express'
+import Joi, { string } from 'joi'
+import { Container } from 'typedi'
 
-import { Container, Inject, Service } from "typedi"
+import { ProfileUseCase } from '../../useCases/profile-usecases'
 
-const profileUseCase: ProfileUseCase = Container.get("profileUseCase")
+const inputSchema = Joi.object({
+  name: Joi.string(),
+  age: Joi.number,
+  address: Joi.array().items(string)
+})
 
 export const profileRoute = express.Router()
+
+// TODO: Could refactor, into error handler
+// The default error handler => https://expressjs.com/en/guide/using-middleware.html#middleware.error-handling
 
 export const getAllProfileController = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    // try typeDI lib https://github.com/typestack/typedi
-    // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
-    // await profileDbAdapter.connect()
-    // const profileUseCase = new ProfileUseCase(profileDbAdapter)
-    const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-    const profiles = await profileUseCase.getAllProfileUseCase()
+  const profileUseCase: ProfileUseCase = Container.get('profileUseCase')
+  const profiles = await profileUseCase.getAllProfiles()
 
-
-    res.status(200).send(profiles)
-  } catch (err) {
-    res.status(500).send(err)
-  }
+    res.status(200).send(profiles) // TODO: Does this one need to call .toJSON()?
 }
 
 export const getProfileController = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    const { id } = req.params
-    // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
-    // await profileDbAdapter.connect()
-    // const profileUseCase = new ProfileUseCase(profileDbAdapter)
-    const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-    const profile = await profileUseCase.getDataByIdUseCase(id)
-    res.status(200).send(profile.toJSON())
-  } catch (err) {
-    res.status(500).send(err)
-  }
+  const profileUseCase: ProfileUseCase = Container.get('profileUseCase')
+  const { id } = req.params
+  const profile = await profileUseCase.getProfileById(id)
+  res.status(200).send(profile)
 }
 
 export const postProfileController = async (
   req: express.Request,
   res: express.Response
 ) => {
-  try {
-    if (Object.keys(req.body).length <= 0) {
-      res.status(500).send("No input data")
-    } else {
-      const { _id, name, age, address } = req.body
-      // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
-      // await profileDbAdapter.connect()
-      // const profileUseCase = new ProfileUseCase(profileDbAdapter)
-      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-      await profileUseCase.postDataUseCase(_id, name, age, address)
-
-      res.status(201).send({ status: "SUCCESS" })
-
-    }
-  } catch (err) {
-    res.status(500).send(err)
-  }
-}
-
-export const putProfileController = async (req: express.Request, res: express.Response) => {
-  try {
 
     if (Object.keys(req.body).length <= 0) {
       res.status(500).send("No input data")
-    } else {
-      const { id } = req.params
-      const { name, age, address } = req.body
-      // const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
-      // await profileDbAdapter.connect()
-      // const profileUseCase = new ProfileUseCase(profileDbAdapter)
-      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-      await profileUseCase.putDataUseCase(id, name, age, address)
+    } 
+    const { name, age, address } = req.body
+    inputSchema.validate({name, age, address})
 
-      res.status(201).send({ status: "SUCCESS" })
-    }
+    const profileUseCase: ProfileUseCase = Container.get('profileUseCase')
+    await profileUseCase.createProfile(name, age, address)
 
-  } catch (err) {
-    res.status(500).send(err)
+    res.status(201).send({ status: 'SUCCESS' })
+}
+
+export const putProfileController = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const profileUseCase: ProfileUseCase = Container.get('profileUseCase')
+  // TODO: Validate not sufficient enough
+  // Could use lib like joi + middleware to
+  // https://joi.dev/api/?v=17.6.0 => Joi
+  // https://expressjs.com/en/guide/using-middleware.html => Middleware
+  if (Object.keys(req.body).length <= 0) {
+    res.status(500).send('No input data')
+  } else {
+    const { id } = req.params
+    const { name, age, address } = req.body
+    inputSchema.validate({name, age, address})
+    await profileUseCase.updateProfile(id, {name, age, address})
+
+    res.status(201).send({ status: 'SUCCESS' })
   }
 }
 
-export const deleteProfileController = async (req: express.Request, res: express.Response) => {
-  console.log("before try")
-  try {
+export const deleteProfileController = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const profileUseCase: ProfileUseCase = Container.get('profileUseCase')
+  const { id } = req.params
+  await profileUseCase.deleteProfile(id)
 
-      const { id } = req.params
-
-      console.log("inside try 1")
-      const profileDbAdapter = new ProfileDbAdapter(config.mongoConfig)
-      await profileDbAdapter.connect()
-      const profileUseCaseq = new ProfileUseCase(profileDbAdapter)
-      console.log("inside try 2")
-      const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-      await profileUseCase.deleteDataUseCase(id)
-
-      res.status(201).send({ status: `DELETE ${id} SUCCESS` })
-      console.log("inside try 3")
-  } catch (err) {
-    res.status(500).send(err)
-  }
-  console.log("after try")
+    res.status(201).send({ status: `DELETE ${id} SUCCESS` })
 }
 
-
-profileRoute.get("/", getAllProfileController)
-profileRoute.get("/:id", getProfileController)
-profileRoute.post("/", postProfileController)
-profileRoute.put("/:id", putProfileController)
-profileRoute.delete("/:id", deleteProfileController)
+profileRoute.get('/', getAllProfileController)
+profileRoute.get('/:id', getProfileController)
+profileRoute.post('/', postProfileController)
+profileRoute.put('/:id', putProfileController)
+profileRoute.delete('/:id', deleteProfileController)
