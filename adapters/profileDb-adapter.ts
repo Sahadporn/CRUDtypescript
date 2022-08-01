@@ -1,4 +1,4 @@
-import { Collection, MongoClient } from 'mongodb'
+import { Collection, MongoClient, ObjectId } from 'mongodb'
 import { ProfileEntity } from '../entity/Profile-entity'
 import { ProfileDbInterface } from '../useCases/profile-usecases'
 import { Service } from 'typedi'
@@ -14,7 +14,7 @@ type DbConfig = {
 
 @Service()
 export class ProfileDbAdapter implements ProfileDbInterface {
-  private dbCollection: Collection<ProfileEntity> | any // TODO: Don't have to be any
+  private dbCollection?: Collection<ProfileEntity> // TODO: Don't have to be any
   private readonly dbConfig: DbConfig
 
   constructor(dbConfig: DbConfig) {
@@ -35,28 +35,28 @@ export class ProfileDbAdapter implements ProfileDbInterface {
   }
 
   public async getAll(): Promise<ProfileEntity[]> {
-    const data = await this.dbCollection.find().toArray()
+    const data = await (this.dbCollection as Collection<ProfileEntity>).find().toArray()
 
     if (!data) {
       throw new Error(`Cannot retrieve data`)
     }
 
     let arr: ProfileEntity[] = []
-    data.map((element: ProfileEntity) => {
+    data.map((element) => {
         arr.push(new ProfileEntity(
           element.name,
           element.age,
           element.address,
           element.created_date,
           element.updated_date,
-          element._id,
+          element._id.toString(),
           ))
     })
     return arr
   }
 
   public async getById(id: string): Promise<ProfileEntity> {
-    let data = await this.dbCollection.findOne({ _id: id })
+    let data = await (this.dbCollection as Collection<ProfileEntity>).findOne({ "_id": new ObjectId(id) })
 
     if (!data) {
       throw new Error(`Cannot find profile with id ${id}}`)
@@ -68,24 +68,21 @@ export class ProfileDbAdapter implements ProfileDbInterface {
       data.address,
       data.created_date,
       data.updated_date,
-      data._id,
+      data._id as unknown as string,
       )
   }
 
-  // TODO: Do you want to always update name, age and address?
-  // TODO: Make sure that name, age and address is not undefined at runtime
   public async insert(
     profile: ProfileEntity
   ): Promise<void> {
     try {
-      let res = await this.dbCollection.insertOne(
+      let res = await (this.dbCollection as Collection<ProfileEntity>).insertOne(
         {
-          $currentDate: { updated_date: true, created_date: true },
-          $set: {
             name: profile.name,
             age: profile.age,
-            address: profile.address
-          }
+            address: profile.address,
+            updated_date: new Date(),
+            created_date: new Date()
         }
       )
     } catch (err) {
@@ -95,12 +92,14 @@ export class ProfileDbAdapter implements ProfileDbInterface {
 
   public async update(id: string, update: ProfileEntity): Promise<void> {
     try {
-      let res = await this.dbCollection.updateOne(
-        {"_id": id},
+      let res = await (this.dbCollection as Collection<ProfileEntity>).updateOne(
+        {"_id": new ObjectId(id)},
         {
           $currentDate: {updated_date: true},
           $set: {
-            ...update
+            name: update.name,
+            age: update.age,
+            address: update.address
           }
         }
       )
@@ -111,7 +110,7 @@ export class ProfileDbAdapter implements ProfileDbInterface {
 
   public async delete(id: string): Promise<void> {
     try {
-      let res = await this.dbCollection.deleteOne({ _id: id })
+      let res = await (this.dbCollection as Collection<ProfileEntity>).deleteOne({ "_id": new ObjectId(id)})
     } catch (err) {
       console.log('Deletion failed: ', err)
     }

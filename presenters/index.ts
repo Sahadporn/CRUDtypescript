@@ -5,11 +5,35 @@ import cors from "cors"
 import { config } from "./config"
 import bodyParser from "body-parser"
 import methodOverride from "method-override"
+import Joi, { string } from 'joi'
 
 import { profileRoute } from "./routes/profile-routes"
 import swaggerUi from "swagger-ui-express"
 import * as swaggerDocument from "../swagger.json"
 import { InitContainer } from "./di"
+
+
+// const inputSchema = Joi.object({
+//   name: Joi.string(),
+//   age: Joi.number,
+//   address: Joi.array().items(Joi.string())
+// })
+
+function errorHandler (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
+  res.status(500)
+  res.render('error ', { error: err.message })
+  next()
+}
+
+// export function joiValidator (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
+//   if (Object.keys(req.body).length <= 0) {
+//     res.status(500).send("No input data")
+//   } 
+//   const { name, age, address } = req.body
+//   if (inputSchema.validate({name, age, address})) {
+//     next()
+//   }
+// }
 
 const initApp = async () => {
   await InitContainer()
@@ -20,10 +44,6 @@ const initApp = async () => {
     origin: allowedOrigins,
   }
 
-  function errorHandler (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
-    res.status(500)
-    res.render('error ', { error: err })
-  }
   
   app.use(cors(options))
   app.use(bodyParser.json())

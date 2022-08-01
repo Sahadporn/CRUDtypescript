@@ -7,9 +7,9 @@ export class ProfileEntity implements ProfileInterface {
     public address: string[],
     public created_date: Date,
     public updated_date: Date,
-    public _id?: string
+    public id?: string
   ) {
-    this._id = _id
+    this.id = id
     this.name = name
     this.age = age
     this.address = address
