@@ -1,9 +1,8 @@
-import express from 'express'
+import express, {NextFunction} from 'express'
 import Joi, { string } from 'joi'
 import { Container } from 'typedi'
 
 import { ProfileUseCase } from '../../useCases/profile-usecases'
-// import { joiValidator } from '../index'
 
 const inputSchema = Joi.object({
   name: Joi.string(),
@@ -11,7 +10,10 @@ const inputSchema = Joi.object({
   address: Joi.array().items(Joi.string())
 })
 
-export function joiValidator (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
+// joiValidator runnable but not working
+// post method does not call joi middleware 
+function joiValidator (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
+  console.log("inside joiValidator")
   if (Object.keys(req.body).length <= 0) {
     res.status(500).send("No input data")
   } 
@@ -19,12 +21,13 @@ export function joiValidator (err: Error, req: express.Request, res: express.Res
   if (inputSchema.validate({name, age, address})) {
     next()
   }
+  else {
+    res.status(500).send("Incorrect input data")
+  }
 }
 
 export const profileRoute = express.Router()
 
-// TODO: Could refactor, into error handler
-// The default error handler => https://expressjs.com/en/guide/using-middleware.html#middleware.error-handling
 
 export const getAllProfileController = async (
   req: express.Request,
@@ -64,10 +67,6 @@ export const putProfileController = async (
   res: express.Response
 ) => {
   const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase)
-  // TODO: Validate not sufficient enough
-  // Could use lib like joi + middleware to
-  // https://joi.dev/api/?v=17.6.0 => Joi
-  // https://expressjs.com/en/guide/using-middleware.html => Middleware
  
     const { id } = req.params
     const { name, age, address } = req.body

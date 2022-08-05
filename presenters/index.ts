@@ -13,11 +13,6 @@ import * as swaggerDocument from "../swagger.json"
 import { InitContainer } from "./di"
 
 
-// const inputSchema = Joi.object({
-//   name: Joi.string(),
-//   age: Joi.number,
-//   address: Joi.array().items(Joi.string())
-// })
 
 function errorHandler (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
   res.status(500)
@@ -25,15 +20,6 @@ function errorHandler (err: Error, req: express.Request, res: express.Response, 
   next()
 }
 
-// export function joiValidator (err: Error, req: express.Request, res: express.Response, next: NextFunction) {
-//   if (Object.keys(req.body).length <= 0) {
-//     res.status(500).send("No input data")
-//   } 
-//   const { name, age, address } = req.body
-//   if (inputSchema.validate({name, age, address})) {
-//     next()
-//   }
-// }
 
 const initApp = async () => {
   await InitContainer()
