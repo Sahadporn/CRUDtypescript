@@ -11,10 +11,9 @@ export interface ProfileDbInterface {
 
 @Service()
 export class ProfileUseCase {
-
   constructor(
     @Inject('ProfileDbDi')
-    private readonly profileDb: ProfileDbAdapter 
+    private readonly profileDb: ProfileDbAdapter
   ) {
     this.profileDb.connect()
   }
@@ -27,16 +26,11 @@ export class ProfileUseCase {
     return await this.profileDb.getById(id)
   }
 
-  public async createProfile(
-    name: string,
-    age: number,
-    address: string[]
-  ) {
+  public async createProfile(name: string, age: number, address: string[]) {
     let profile = new ProfileEntity(name, age, address, new Date(), new Date())
     return await this.profileDb.insert(profile)
   }
 
-  // TODO: Not all field want to update, some could be undefined at runtime
   public async updateProfile(
     id: string,
     update: Partial<{
@@ -45,7 +39,6 @@ export class ProfileUseCase {
       address: string[]
     }>
   ) {
-    // TODO: update within ProfileEntity first then send it to update function
     const profile = await this.profileDb.getById(id)
     for (let element in update) {
       if (element !== undefined) {
@@ -54,10 +47,11 @@ export class ProfileUseCase {
           age: number
           address: string[]
         }
-        (profile[key] as any) = update[key]
+        ;(profile[key] as any) = update[key]
       }
     }
 
+    // TODO: Get id from ProfileEntity
     return await this.profileDb.update(id, profile)
   }
 
