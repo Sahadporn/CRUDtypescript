@@ -12,9 +12,17 @@ type DbConfig = {
   collection: string;
 };
 
+type ProfileCollection = Collection<
+  Omit<ProfileEntity, "id" | "createdAt" | "updatedAt"> & {
+    _id: ObjectId;
+    created_at: Date;
+    updated_at: Date;
+  }
+>;
+
 @Service()
 export class ProfileDbAdapter implements ProfileDbInterface {
-  private dbCollection?: Collection<ProfileEntity>;
+  private dbCollection?: ProfileCollection;
   private readonly dbConfig: DbConfig;
 
   constructor(dbConfig: DbConfig) {
@@ -30,37 +38,25 @@ export class ProfileDbAdapter implements ProfileDbInterface {
       .collection(this.dbConfig.collection);
   }
 
-  public getConfig() {
-    return this.dbConfig;
-  }
-
   public async getAll(): Promise<ProfileEntity[]> {
-    const data = await (this.dbCollection as Collection<ProfileEntity>)
+    const data = await (this.dbCollection as ProfileCollection)
       .find()
       .toArray();
 
-    if (!data) {
-      throw new Error(`Cannot retrieve data`);
-    }
-
-    let arr: ProfileEntity[] = [];
-    data.map((element) => {
-      arr.push(
-        new ProfileEntity(
-          element.name,
-          element.age,
-          element.address,
-          element.created_date,
-          element.updated_date,
-          element._id.toString()
-        )
+    return data.map((element) => {
+      return new ProfileEntity(
+        element.name,
+        element.age,
+        element.address,
+        element.created_at,
+        element.updated_at,
+        element._id.toHexString()
       );
     });
-    return arr;
   }
 
   public async getById(id: string): Promise<ProfileEntity> {
-    let data = await (this.dbCollection as Collection<ProfileEntity>).findOne({
+    const data = await (this.dbCollection as ProfileCollection).findOne({
       _id: new ObjectId(id),
     });
 
@@ -72,55 +68,40 @@ export class ProfileDbAdapter implements ProfileDbInterface {
       data.name,
       data.age,
       data.address,
-      data.created_date,
-      data.updated_date,
-      data._id as unknown as string
+      data.created_at,
+      data.updated_at,
+      data._id.toHexString()
     );
   }
 
   public async insert(profile: ProfileEntity): Promise<void> {
-    try {
-      let res = await (
-        this.dbCollection as Collection<ProfileEntity>
-      ).insertOne({
-        name: profile.name,
-        age: profile.age,
-        address: profile.address,
-        updated_date: new Date(),
-        created_date: new Date(),
-      });
-    } catch (err) {
-      console.log("Insert failed: ", err);
-    }
+    await (this.dbCollection as ProfileCollection).insertOne({
+      _id: new ObjectId(),
+      name: profile.name,
+      age: profile.age,
+      address: profile.address,
+      updated_at: new Date(),
+      created_at: new Date(),
+    });
   }
 
   public async update(update: ProfileEntity): Promise<void> {
-    try {
-      let res = await (
-        this.dbCollection as Collection<ProfileEntity>
-      ).updateOne(
-        { _id: new ObjectId(update.id) },
-        {
-          $currentDate: { updated_date: true },
-          $set: {
-            name: update.name,
-            age: update.age,
-            address: update.address,
-          },
-        }
-      );
-    } catch (err) {
-      console.log("Update failed: ", err);
-    }
+    await (this.dbCollection as ProfileCollection).updateOne(
+      { _id: new ObjectId(update.id) },
+      {
+        $currentDate: { updated_date: true },
+        $set: {
+          name: update.name,
+          age: update.age,
+          address: update.address,
+        },
+      }
+    );
   }
 
   public async delete(id: string): Promise<void> {
-    try {
-      let res = await (
-        this.dbCollection as Collection<ProfileEntity>
-      ).deleteOne({ _id: new ObjectId(id) });
-    } catch (err) {
-      console.log("Deletion failed: ", err);
-    }
+    await (this.dbCollection as ProfileCollection).deleteOne({
+      _id: new ObjectId(id),
+    });
   }
 }

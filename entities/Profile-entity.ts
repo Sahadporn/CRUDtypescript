@@ -1,19 +1,26 @@
-import { ProfileInterface } from './Interface'
-
-export class ProfileEntity implements ProfileInterface {
+export class ProfileEntity {
   constructor(
     public name: string,
     public age: number,
     public address: string[],
-    public created_date: Date,
-    public updated_date: Date,
-    public id?: string
-  ) {
-    this.id = id
-    this.name = name
-    this.age = age
-    this.address = address
-    this.created_date = created_date
-    this.updated_date = updated_date
+    private _createdAt: Date,
+    public updatedAt: Date,
+    private _id?: string
+  ) {}
+
+  public get id(): string {
+    if (!this._id) throw new Error("ID is unassigned");
+
+    return this._id;
+  }
+
+  public set id(value: string) {
+    if (this._id) throw new Error("ID can only be assogn once");
+
+    this._id = value;
+  }
+
+  public get createdAt(): Date {
+    return this._createdAt;
   }
 }
