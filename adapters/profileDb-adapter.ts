@@ -43,14 +43,14 @@ export class ProfileDbAdapter implements ProfileDbInterface {
       .find()
       .toArray();
 
-    return data.map((element) => {
+    return data.map((profile) => {
       return new ProfileEntity(
-        element.name,
-        element.age,
-        element.address,
-        element.created_at,
-        element.updated_at,
-        element._id.toHexString()
+        profile.name,
+        profile.age,
+        profile.address,
+        profile.created_at,
+        profile.updated_at,
+        profile._id.toHexString()
       );
     });
   }

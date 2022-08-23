@@ -3,10 +3,10 @@ import { ProfileDbAdapter } from "../adapters/profileDb-adapter";
 import { config } from "./config";
 
 const InitContainer = async () => {
-    const dbConnection = new ProfileDbAdapter(config.mongoConfig)
-    await dbConnection.connect()
+  const dbConnection = new ProfileDbAdapter(config.mongoConfig);
+  await dbConnection.connect();
 
-    Container.set("ProfileDbDi", dbConnection)
-}
+  Container.set("ProfileDbDi", dbConnection);
+};
 
-export { InitContainer }
+export { InitContainer };

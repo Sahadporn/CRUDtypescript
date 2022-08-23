@@ -67,11 +67,11 @@ export const getAllProfileController = async (
   const profileUseCase: ProfileUseCase = Container.get(ProfileUseCase);
   let profiles = await profileUseCase.getAllProfiles();
 
-  profiles.map((element) => {
-    return profileFormatter(element);
+  const formattedProfiles = profiles.map((profile) => {
+    return profileFormatter(profile);
   });
 
-  res.status(200).send(profiles);
+  res.status(200).send(formattedProfiles);
 };
 
 export const getProfileController = async (
@@ -84,7 +84,7 @@ export const getProfileController = async (
   res.status(200).send(profileFormatter(profile));
 };
 
-export const postProfileController = async (
+export const createProfileController = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -96,7 +96,7 @@ export const postProfileController = async (
   res.status(201).send({ status: "SUCCESS" });
 };
 
-export const putProfileController = async (
+export const updateProfileController = async (
   req: express.Request,
   res: express.Response
 ) => {
@@ -124,6 +124,6 @@ export const profileRoute = express.Router();
 
 profileRoute.get("/", getAllProfileController);
 profileRoute.get("/:id", getProfileController);
-profileRoute.post("/", joiValidator, postProfileController);
-profileRoute.put("/:id", putProfileController);
+profileRoute.post("/", createProfileController);
+profileRoute.put("/:id", updateProfileController);
 profileRoute.delete("/:id", deleteProfileController);

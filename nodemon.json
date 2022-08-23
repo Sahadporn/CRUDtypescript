@@ -1,0 +1,15 @@
+{
+    "ignore": [
+        ".git",
+        ".vscode",
+        "node_modules/**/node_modules"
+    ],
+    "verbose": true,
+    "watch": [
+        "src",
+        "tsconfig.json",
+        ".env"
+    ],
+    "ext": "ts",
+    "exec": "ts-node presenters/index.ts"
+}
