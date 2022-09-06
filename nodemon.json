@@ -11,5 +11,5 @@
         ".env"
     ],
     "ext": "ts",
-    "exec": "ts-node presenters/index.ts"
+    "exec": "ts-node src/presenters/index.ts"
 }

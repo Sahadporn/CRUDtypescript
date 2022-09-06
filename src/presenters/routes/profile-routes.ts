@@ -1,17 +1,23 @@
 import express, { NextFunction } from "express";
 import { Container } from "typedi";
-import { ProfileEntity } from "../../entities/Profile-entity";
 import Joi from "joi";
 
+import { ProfileEntity } from "../../entities/Profile-entity";
 import { ProfileUseCase } from "../../useCases/profile-usecases";
 
-const inputSchema = Joi.object({
+const createSchema = Joi.object({
+  name: Joi.string().min(2).max(30).required(),
+  age: Joi.number().integer().min(1).max(120).required(),
+  address: Joi.array().items(Joi.string()).required(),
+});
+
+const updateSchema = Joi.object({
   name: Joi.string().min(2).max(30),
   age: Joi.number().integer().min(1).max(120),
   address: Joi.array().items(Joi.string()),
 });
 
-const middleware = (schema: Joi.ObjectSchema) => {
+const joiValidator = (schema: Joi.ObjectSchema) => {
   return (req: express.Request, res: express.Response, next: NextFunction) => {
     const { error } = schema.validate(req.body);
     const valid = error == null;
@@ -103,6 +109,6 @@ export const profileRoute = express.Router();
 
 profileRoute.get("/", getAllProfileController);
 profileRoute.get("/:id", getProfileController);
-profileRoute.post("/", middleware(inputSchema), createProfileController);
-profileRoute.put("/:id", middleware(inputSchema), updateProfileController);
+profileRoute.post("/", joiValidator(createSchema), createProfileController);
+profileRoute.put("/:id", joiValidator(updateSchema), updateProfileController);
 profileRoute.delete("/:id", deleteProfileController);

@@ -40,9 +40,9 @@ export class ProfileUseCase {
     }>
   ) {
     const profile = await this.profileDb.getById(id);
-    for (const element in update) {
-      if (element !== undefined) {
-        const key = element as keyof Pick<
+    for (const [field, value] of Object.entries(update)) {
+      if (value !== undefined) {
+        const key = field as keyof Pick<
           ProfileEntity,
           "name" | "age" | "address"
         >;
