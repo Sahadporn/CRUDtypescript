@@ -15,7 +15,7 @@ For Swagger document go to: <http://127.0.0.1:3000/swagger>
 For Postman document go to:
 
 ```ts
-src / CRUDtypescript.postman_collection.json;
+docs / CRUDtypescript.postman_collection.json;
 ```
 
 or
