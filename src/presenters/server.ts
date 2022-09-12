@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import methodOverride from "method-override";
 
 import swaggerUi from "swagger-ui-express";
-import * as swaggerDocument from "../swagger.json";
+import * as swaggerDocument from "../../docs/swagger.json";
 import { route } from "./routes/index";
 
 export const createServer = () => {
